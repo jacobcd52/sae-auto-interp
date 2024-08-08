@@ -11,7 +11,7 @@ requires-python = ">=3.10"
 keywords = ["interpretability", "explainable-ai"]
 dependencies = [
     "datasets",
-    "nnsight",
+    "git+https://github.com/ndif-team/nnsight.git@0.3",
     "orjson",
     "sae@git+https://github.com/EleutherAI/sae",
     "safetensors",
