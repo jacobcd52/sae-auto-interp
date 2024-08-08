@@ -1,4 +1,5 @@
 sae_auto_interp/autoencoders/SAELens/temp_sae
+sae-auto-interp/temp_sae
 
 *.egg-info
 *__pycache__

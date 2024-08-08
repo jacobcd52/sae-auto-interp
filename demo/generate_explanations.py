@@ -37,16 +37,16 @@ def main(args):
     ### Load dataset ###
     #TODO: we should probably save the token information when we save the features that
     # when we load it we don't have to remember all the details.
-    tokenizer = load_tokenizer("meta-llama/Meta-Llama-3-8B")
+    tokenizer = load_tokenizer("google/gemma-2b-it")
     tokens = load_tokenized_data(
-        256,
+        128,
         tokenizer,
         "kh4dien/fineweb-100m-sample",
-        "train",
+        "train[:1%]",
     )
     feature_dict = {f"{module}": torch.arange(start_feature,start_feature+n_features)}
     dataset = FeatureDataset(
-        raw_dir=f"raw_features_{sae_model}",
+        raw_dir=f"/root/sae-auto-interp/splits",
         cfg=feature_cfg,
         modules=[module],
         features=feature_dict,
@@ -81,7 +81,7 @@ def main(args):
 
         return result
     #try making the directory if it doesn't exist
-    os.makedirs(f"results/explanations/{sae_model}_{experiment_name}", exist_ok=True)
+    os.makedirs(f"results/explanations/{experiment_name}", exist_ok=True)
 
     explainer_pipe = process_wrapper(
         SimpleExplainer(
@@ -91,42 +91,42 @@ def main(args):
         postprocess=explainer_postprocess,
     )
 
-    ### Build Scorer pipe ###
+    # ### Build Scorer pipe ###
 
-    def scorer_preprocess(result):
-        record = result.record
+    # def scorer_preprocess(result):
+    #     record = result.record
         
-        record.explanation = result.explanation
-        record.extra_examples = record.random_examples
+    #     record.explanation = result.explanation
+    #     record.extra_examples = record.random_examples
 
-        return record
+    #     return record
 
-    def scorer_postprocess(result, score_dir):
-        with open(f"results/scores/{sae_model}_{experiment_name}_{score_dir}/{result.record.feature}.txt", "wb") as f:
-            f.write(orjson.dumps(result.score))
+    # def scorer_postprocess(result, score_dir):
+    #     with open(f"results/scores/{sae_model}_{experiment_name}_{score_dir}/{result.record.feature}.txt", "wb") as f:
+    #         f.write(orjson.dumps(result.score))
 
-    os.makedirs(f"results/scores/{sae_model}_{experiment_name}_recall", exist_ok=True)
-    os.makedirs(f"results/scores/{sae_model}_{experiment_name}_fuzz", exist_ok=True)
+    # os.makedirs(f"results/scores/{sae_model}_{experiment_name}_recall", exist_ok=True)
+    # os.makedirs(f"results/scores/{sae_model}_{experiment_name}_fuzz", exist_ok=True)
 
-    scorer_pipe = Pipe(
-        process_wrapper(
-            RecallScorer(client, tokenizer=tokenizer, batch_size=batch_size,verbose=False,log_prob=True),
-            preprocess=scorer_preprocess,
-            postprocess=partial(scorer_postprocess, score_dir="recall"),
-        ),
-        process_wrapper(
-            FuzzingScorer(client, tokenizer=tokenizer, batch_size=batch_size,verbose=False,log_prob=True),
-            preprocess=scorer_preprocess,
-            postprocess=partial(scorer_postprocess, score_dir="fuzz"),
-        ),
-    )
+    # scorer_pipe = Pipe(
+    #     process_wrapper(
+    #         RecallScorer(client, tokenizer=tokenizer, batch_size=batch_size,verbose=False,log_prob=True),
+    #         preprocess=scorer_preprocess,
+    #         postprocess=partial(scorer_postprocess, score_dir="recall"),
+    #     ),
+    #     process_wrapper(
+    #         FuzzingScorer(client, tokenizer=tokenizer, batch_size=batch_size,verbose=False,log_prob=True),
+    #         preprocess=scorer_preprocess,
+    #         postprocess=partial(scorer_postprocess, score_dir="fuzz"),
+    #     ),
+    # )
 
     ### Build the pipeline ###
 
     pipeline = Pipeline(
         loader,
         explainer_pipe,
-        scorer_pipe,
+        # scorer_pipe,
     )
 
     asyncio.run(pipeline.run(max_processes=20))
@@ -136,13 +136,13 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("--batch_size", type=int, default=5)
     parser.add_argument("--model", type=str, default="128k")
-    parser.add_argument("--module", type=str, default=".transformer.h.0")
+    parser.add_argument("--module", type=str, default=".model.layers.12")
     parser.add_argument("--features", type=int, default=100)
     parser.add_argument("--start_feature", type=int, default=0)
     parser.add_argument("--experiment_name", type=str, default="default")
     parser.add_arguments(ExperimentConfig, dest="experiment_options")
     parser.add_arguments(FeatureConfig, dest="feature_options")
-    parser.add_argument("--port", type=int, default=8001)
+    parser.add_argument("--port", type=int, default=8000)
     args = parser.parse_args()
     
     experiment_name = args.experiment_name

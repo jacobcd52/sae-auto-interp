@@ -58,7 +58,6 @@ class Cache:
         """
         Get the nonzero feature locations and activations
         """
-
         nonzero_feature_locations = torch.nonzero(latents.abs() > 1e-5)
         nonzero_feature_activations = latents[latents.abs() > 1e-5]
 
@@ -181,6 +180,7 @@ class FeatureCache:
 
                 module_dir = f"{save_dir}/{module_path}"
                 os.makedirs(module_dir, exist_ok=True)
+                print("saving split at ", module_dir)
 
                 output_file = f"{module_dir}/{start}_{end}.safetensors"
 

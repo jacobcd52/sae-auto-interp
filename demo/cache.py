@@ -34,7 +34,7 @@ def main(cfg: CacheConfig):
 
     cache.save_splits(
         n_splits=cfg.n_splits,
-        save_dir="/share/u/caden/sae-auto-interp/raw_features/weights",
+        save_dir="splits",
     )
 
 

@@ -38,12 +38,13 @@ def load_saelens_autoencoders(model, hf_dir: str, weight_paths: List[str], cfg_p
 
     with model.edit(" "):
         for _, submodule in submodules.items():
+            # TODO check these outputs
             if "resid_pre" in hook_pt:
-                acts = submodule.output[0][0]
+                acts = submodule.output[0]
             elif "resid_post" in hook_pt:
-                acts = submodule.output[0]
+                acts = submodule.output
             elif "mlp_out" in hook_pt:
-                acts = submodule.output[0]
+                acts = submodule.output
             else:
                 raise ValueError(f"hook point {hook_pt} not yet supported")
             submodule.ae(acts, hook=True)
