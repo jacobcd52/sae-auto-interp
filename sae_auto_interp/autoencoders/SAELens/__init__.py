@@ -32,6 +32,7 @@ def load_saelens_autoencoders(model, hf_dir: str, weight_paths: List[str], cfg_p
             submodule = model.model.layers[ae.cfg.hook_layer].mlp
         else:
             raise ValueError(f"hook point {hook_pt} not yet supported")
+        print("module path", submodule._module_path)
 
         submodule.ae = AutoencoderLatents(ae, partial(_forward, ae), width=ae.cfg.d_sae)
         submodules[submodule._module_path] = submodule
