@@ -49,7 +49,8 @@ def split_quantiles(
     for i in range(n_quantiles):
         quantile = examples[i * quantile_size : (i + 1) * quantile_size]
 
-        sample = random.sample(quantile, n_samples)
+        fixed_n_samples = min(n_samples, quantile_size)
+        sample = random.sample(quantile, fixed_n_samples)
         samples.append(sample)
 
     return samples

@@ -1,3 +1,6 @@
+# import sys
+# sys.path.append("/root/sae-auto-interp/")
+
 from nnsight import LanguageModel
 from simple_parsing import ArgumentParser
 
@@ -23,7 +26,7 @@ def main(cfg: CacheConfig):
         cfg.ctx_len,
         model.tokenizer,
         "kh4dien/fineweb-100m-sample",
-        "train[:1%]",
+        "train[:2%]",
     )
 
     cache = FeatureCache(

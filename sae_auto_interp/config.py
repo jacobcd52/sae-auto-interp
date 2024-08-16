@@ -39,10 +39,10 @@ class FeatureConfig(Serializable):
     max_examples: int = 10000
     """Maximum number of examples for a feature to included"""
 
-    example_ctx_len: int = 64
+    example_ctx_len: int = 128
     """Length of each example"""
 
-    n_splits: int = 2
+    n_splits: int = 5
     """Number of splits that features were devided into"""
 
 
@@ -51,10 +51,10 @@ class CacheConfig(Serializable):
     batch_size: int = 32
     """Number of sequences to process in a batch"""
 
-    ctx_len: int = 256
+    ctx_len: int = 128
     """Context length of the autoencoder. Each batch is shape (batch_size, ctx_len)"""
 
-    n_tokens: int = 10_000_000
+    n_tokens: int = 1_000_000
     """Number of tokens to cache"""
 
     n_splits: int = 5
