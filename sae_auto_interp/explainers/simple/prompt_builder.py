@@ -32,6 +32,7 @@ def build_prompt(
     cot: bool = False,
     activations: bool = False,
     top_logits: List[str] = None,
+    subject_specific_instructions: str = "",
 ):
     logits = True if top_logits is not None else False
 
@@ -39,6 +40,7 @@ def build_prompt(
         cot=cot,
         logits=logits,
         activations=activations,
+        subject_specific_instructions=subject_specific_instructions,
     )
 
     few_shot_examples = build_examples(
@@ -60,5 +62,6 @@ def build_prompt(
             "content": user_start,
         }
     )
-
+    for message in messages:
+        print(message)
     return messages

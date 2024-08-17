@@ -21,6 +21,7 @@ def get_activations(sae_repo : str,
                     batch_size : int = 32,
                     ctx_len : int = 128,
                     n_tokens : int = 1_000_000,
+                    remove_bos : bool = True
                     ):
     
     cfg = CacheConfig(batch_size=batch_size, ctx_len=ctx_len, n_tokens=n_tokens, n_splits=5)

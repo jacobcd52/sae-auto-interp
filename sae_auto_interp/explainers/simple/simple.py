@@ -18,7 +18,9 @@ class SimpleExplainer(Explainer):
         logits: bool = False,
         activations: bool = False,
         threshold: float = 0.6,
+        subject_specific_instructions: str = "",
         **generation_kwargs,
+
     ):
         self.client = client
         self.tokenizer = tokenizer
@@ -30,6 +32,8 @@ class SimpleExplainer(Explainer):
 
         self.threshold = threshold
         self.generation_kwargs = generation_kwargs
+
+        self.subject_specific_instructions = subject_specific_instructions
 
     def normalize_examples(self, record, train):
         max_activation = record.examples[0].max_activation
@@ -120,4 +124,5 @@ class SimpleExplainer(Explainer):
             cot=self.cot,
             activations=self.activations,
             top_logits=top_logits,
+            subject_specific_instructions=self.subject_specific_instructions,
         )

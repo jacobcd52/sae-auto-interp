@@ -1,5 +1,6 @@
 from torchtyping import TensorType
 from transformers import AutoTokenizer
+import torch
 
 from .features import FeatureRecord
 
@@ -10,7 +11,8 @@ def load_tokenized_data(
     dataset_repo: str,
     dataset_split: str,
     dataset_name: str = "",
-    seed: int = 22,
+    seed: int = 42,
+    remove_bos: bool = True,
 ):
     """
     Load a huggingface dataset, tokenize it, and shuffle.
@@ -24,7 +26,15 @@ def load_tokenized_data(
 
     tokens = tokens.shuffle(seed)["tokens"]
 
-    return tokens
+    cleaned_tokens = []
+    if remove_bos:
+        for i in range(len(tokens)):
+            if not tokenizer.bos_token_id in tokens[i, 1:]:
+                cleaned_tokens.append(tokens[i])
+    
+    cleaned_tokens = torch.stack(cleaned_tokens)
+
+    return cleaned_tokens
 
 
 def load_filter(path: str, device: str = "cuda:0"):

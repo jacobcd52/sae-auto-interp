@@ -1,14 +1,16 @@
 ### SYSTEM PROMPT ###
 
-SYSTEM = """You are a meticulous AI researcher conducting an important investigation into a certain neuron in a language model. Your task is to analyze the neuron and provide an explanation that thoroughly encapsulates its behavior.
+SYSTEM = """You are a meticulous AI researcher conducting an important investigation into a certain neuron in a language model. Your task is to analyze the neuron and explain what causes the neuron to activate.
 {prompt}
 Guidelines:
 
-You will be given a list of text examples on which the neuron activates. The specific tokens which cause the neuron to activate will appear between delimiters like <<this>>. If a sequence of consecutive tokens all cause the neuron to activate, the entire sequence of tokens will be contained between delimiters <<just like this>>. The activation value of the example is listed after each example in parentheses.
+You will be given a list of text examples on which the neuron activates. The specific tokens which cause the neuron to activate will appear between delimiters like <<this>>. If a sequence of consecutive tokens all cause the neuron to activate, the entire sequence of tokens will be contained between delimiters <<just like this>>.
 
-- Try to produce a concise final description. Simply describe the text features that activate the neuron, and what its role might be based on the tokens it predicts.
-- If either the text features or the predicted tokens are completely uninformative, you don't need to mention them.
-- The last line of your response must be the formatted explanation."""
+- You must produce a concise final description. Simply describe the text features that activate the neuron, and what its role might be based on the tokens it predicts.
+- The last line of your response must be the formatted explanation.
+- Think carefully about the patterns in the text examples and the tokens that activate the neuron. Pay attention to detail.
+
+{subject_specific_instructions}"""
 
 COT = """
 (Part 1) Tokens that the neuron activates highly on in text
@@ -251,6 +253,77 @@ EXAMPLE_3_EXPLANATION = """
 [EXPLANATION]: Nouns preceding a quotation mark, representing a distinct objects that contains something.
 """
 
+### EXAMPLE 4 ###
+EXAMPLE_4 = """
+Example 1:  arrive at ∂y<<∂t>>=2ninj+12iexp(3x)−∂F <<∂t>>
+Example 2:  the derivative of f with respect <<to t>> is denoted by <<f'(t)>>.
+Example 3:  4x-3sinx+<<dG/dT>>=__2x+de<<dT>>
+Example 4:  the velocity is the rate of change of position <<with respect to time>>
+"""
+EXAMPLE_4_EXPLANATION = """
+[EXPLANATION]: Derivatives with respect to a time variable.
+"""
+
+
+### EXAMPLE 5 ###
+EXAMPLE_5 = """
+Example 1:  at the time, he was critical of <Thatcher>>'s policies.
+Example 2:  The key figure in delivering Brexit was Boris <<Johnson>>, leader of the Tory party.
+Example 3:  The Prime Minister, David <<Cameron>>, resigned after the Brexit vote.
+Example 4:  The greatest labour prime minister of the 20th century was Clement <<Attlee>>, without a doubt.
+"""
+
+EXAMPLE_5_EXPLANATION = """
+[EXPLANATION]: Prime ministers of the UK.
+"""
+
+### EXAMPLE 6 ###
+EXAMPLE_6 = """
+Example 1:  glucose in the blood is broken down by the hormone <<insulin>>, and converted into energy.
+Example 2:  causes the release of <<adrenaline>>, which increases heart rate.
+Example 3:  A great supplement I always use is <<melatonin>>, which aids with sleep and 
+Example 4:  Lots of bodybuilders take <<HGH>> to help build
+"""
+
+EXAMPLE_6_EXPLANATION = """
+[EXPLANATION]: References to hormones and their effects on the body.
+"""
+
+### EXAMPLE 7 ###
+EXAMPLE_7 = """
+Example 1:  the token is encoded as a one-<<hot>> vector.
+Example 2:  you miss one hundred percent of the s<<hot>>>s you don't take.
+Example 3:  welcome to the <<hot>>el California!
+Example 4:  the food was too <<hot>> to eat.
+"""
+
+EXAMPLE_7_EXPLANATION = """
+[EXPLANATION]: The token "hot", sometimes as part of larger words.
+"""
+
+### EXAMPLE 8 ###
+EXAMPLE_8 = """
+Example 1:  yeah, it was a bit patchy here and <<there>>, but it was mostly good I 
+Example 2:  the dog was running around to and <<fro>>, getting in the way
+Example 3:  I respect politicians from both the left and the <<right>> wings, but
+Example 4:  what we can find over here. But over <<there?>> I'm not so sure, and I'd
+"""
+
+EXAMPLE_8_EXPLANATION = """
+[EXPLANATION]: The second of a pair of words referring to two contrasting locations, e.g. "here" and "there".
+"""
+
+### EXAMPLE 9 ###
+
+EXAMPLE_9 = """
+Example 1:  Let x=1, <<y=3>>, z=1. Find the value of 3x+2<<y>>+z.
+Example 2:  The subgroups H1,<<H2>>,H3 are all subgroups of G such that 1 is isomorphic to G/<<H2>>
+Example 3:  \int dp<<dx>>du f(p<<,x>>,u) = \int dpdxdv f(p,<<x,>>v)
+"""
+
+EXAMPLE_9_EXPLANATION = """
+[EXPLANATION]: References to the second mathematical variable names in a list of three variables.
+"""
 
 def get(item):
     return globals()[item]
@@ -302,6 +375,7 @@ def system(
     cot=False,
     logits=False,
     activations=False,
+    subject_specific_instructions="",
 ):
     prompt = ""
 
@@ -316,6 +390,6 @@ def system(
     return [
         {
             "role": "system",
-            "content": SYSTEM.format(prompt=prompt),
+            "content": SYSTEM.format(prompt=prompt, subject_specific_instructions=subject_specific_instructions),
         }
     ]

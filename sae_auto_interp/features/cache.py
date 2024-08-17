@@ -80,6 +80,7 @@ class FeatureCache:
         submodule_dict: Dict,
         batch_size: int,
         filters: Dict[str, TensorType["indices"]] = None,
+        remove_bos: bool = True,
     ):
         self.model = model
         self.submodule_dict = submodule_dict
@@ -90,6 +91,8 @@ class FeatureCache:
         self.cache = Cache(filters, batch_size=batch_size)
         if filters is not None:
             self.filter_submodules(filters)
+
+        self.remove_bos = remove_bos
 
         print(submodule_dict.keys())
 
@@ -134,6 +137,8 @@ class FeatureCache:
                             buffer[module_path] = submodule.ae.output.save()
 
                     for module_path, latents in buffer.items():
+                        if self.remove_bos:
+                            latents = latents[:, 1:]
                         self.cache.add(latents, batch_number, module_path)
 
                     del buffer
